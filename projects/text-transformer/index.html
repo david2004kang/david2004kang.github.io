@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-zh="文字資料轉換器 - David Kang" data-en="Text Transformer - David Kang">Text Transformer - David Kang</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #f0f0f0;
+            background: linear-gradient(135deg, #141e30 0%, #243b55 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background: rgba(0, 0, 0, 0.35);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .lang-switcher {
+            display: flex;
+            gap: 0.5rem;
+            margin-left: 1rem;
+        }
+
+        .lang-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .lang-btn:hover, .lang-btn.active {
+            background: rgba(255, 215, 0, 0.25);
+            border-color: #ffd700;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #ffd700;
+        }
+
+        main {
+            padding: 120px 0 80px;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .tool-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+
+        .tool-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 18px;
+            padding: 2rem;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        }
+
+        .tool-card h2 {
+            color: #ffd700;
+            margin-bottom: 0.5rem;
+        }
+
+        .tool-card p {
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 140px;
+            padding: 0.8rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.35);
+            color: #f0f0f0;
+            resize: vertical;
+            font-size: 1rem;
+        }
+
+        textarea[readonly] {
+            opacity: 0.9;
+        }
+
+        .button-row {
+            margin: 1rem 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+        }
+
+        button {
+            border: none;
+            border-radius: 999px;
+            padding: 0.6rem 1.6rem;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .primary-btn {
+            background: #ffd700;
+            color: #333;
+            box-shadow: 0 10px 20px rgba(255, 215, 0, 0.25);
+        }
+
+        .secondary-btn {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            color: white;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        .status-text {
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.75);
+            min-height: 1.4rem;
+        }
+
+        .status-text.error {
+            color: #ff8a80;
+        }
+
+        .status-text.success {
+            color: #a1ffb8;
+        }
+
+        footer {
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 4rem;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <div class="logo" data-zh="David Kang" data-en="David Kang">David Kang</div>
+            <ul class="nav-links">
+                <li><a href="../../index.html" data-zh="首頁" data-en="Home">Home</a></li>
+                <li><a href="../../about.html" data-zh="關於我" data-en="About">About</a></li>
+                <li><a href="../text-transformer/index.html" data-zh="文字資料轉換器" data-en="Text Transformer">文字資料轉換器</a></li>
+                <li style="display: none;"><a href="../webgame1/index.html" data-zh="Garden PingPong" data-en="Garden PingPong">Garden PingPong</a></li>
+                <li><a href="../../contact.html" data-zh="聯絡我" data-en="Contact">Contact</a></li>
+                <li>
+                    <div class="lang-switcher">
+                        <button class="lang-btn" onclick="switchLanguage('zh')">中文</button>
+                        <button class="lang-btn active" onclick="switchLanguage('en')">EN</button>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero container">
+            <h1 data-zh="文字資料轉換器" data-en="Text Data Transformer">Text Data Transformer</h1>
+            <p data-zh="即時在瀏覽器中完成 Unicode 與 Base64 編解碼，協助你快速處理各種字串資料。"
+               data-en="Instant Unicode and Base64 conversions directly in the browser, built for fast text-data workflows.">
+               Instant Unicode and Base64 conversions directly in the browser, built for fast text-data workflows.
+            </p>
+        </section>
+
+        <section class="tool-grid container">
+            <div class="tool-card">
+                <h2 data-zh="Unicode/中文字串轉換" data-en="Unicode & Han Text Switcher">Unicode & Han Text Switcher</h2>
+                <p data-zh="輸入 \\uXXXX 字串可還原成中文字；輸入中文則立即轉為對應的 \\u 序列。"
+                   data-en="Paste \\uXXXX sequences to see the decoded text, or type Han characters to get their \\u escapes.">
+                   Paste \\uXXXX sequences to see the decoded text, or type Han characters to get their \\u escapes.
+                </p>
+
+                <label for="unicodeInput" data-zh="輸入內容" data-en="Input">Input</label>
+                <textarea id="unicodeInput"
+                          data-zh-placeholder="貼上 \u63d2\u5165... 或直接輸入中文字"
+                          data-en-placeholder="Paste \\u63d2\\u5165... or type Han characters"></textarea>
+
+                <div class="button-row">
+                    <button class="primary-btn" id="unicodeConvertBtn"
+                            data-zh="自動判斷並轉換" data-en="Auto detect & convert">Auto detect & convert</button>
+                    <button class="secondary-btn" id="unicodeCopyBtn"
+                            data-zh="複製結果" data-en="Copy output">Copy output</button>
+                    <span class="status-text" id="unicodeStatus" data-zh="等待輸入" data-en="Waiting for input">Waiting for input</span>
+                </div>
+
+                <label for="unicodeOutput" data-zh="結果" data-en="Result">Result</label>
+                <textarea id="unicodeOutput" readonly data-zh-placeholder="結果將顯示於此" data-en-placeholder="Your result appears here"></textarea>
+            </div>
+
+            <div class="tool-card">
+                <h2 data-zh="Base64 編碼 / 解碼" data-en="Base64 Encode / Decode">Base64 Encode / Decode</h2>
+                <p data-zh="支援 UTF-8 字串，並即時提示成功或錯誤狀態，方便快速驗證資料。"
+                   data-en="Handles UTF-8 strings with instant success or error hints for quick validation.">
+                   Handles UTF-8 strings with instant success or error hints for quick validation.
+                </p>
+
+                <label for="base64Input" data-zh="輸入原始文字或 Base64" data-en="Raw text or Base64 input">Raw text or Base64 input</label>
+                <textarea id="base64Input"
+                          data-zh-placeholder="輸入欲編碼的文字，或貼上 Base64 欲解碼"
+                          data-en-placeholder="Type text to encode, or paste Base64 to decode"></textarea>
+
+                <div class="button-row">
+                    <button class="primary-btn" id="base64EncodeBtn" data-zh="編碼" data-en="Encode">Encode</button>
+                    <button class="secondary-btn" id="base64DecodeBtn" data-zh="解碼" data-en="Decode">Decode</button>
+                    <span class="status-text" id="base64Status" data-zh="尚未開始" data-en="Idle">Idle</span>
+                </div>
+
+                <label for="base64Output" data-zh="結果" data-en="Result">Result</label>
+                <textarea id="base64Output" readonly data-zh-placeholder="Base64 結果或解碼後字串" data-en-placeholder="Encoded or decoded output"></textarea>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p data-zh="&copy; 2024 David Kang's home. 版權所有." data-en="&copy; 2024 David Kang's home. All rights reserved.">&copy; 2024 David Kang's home. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="../../assets/language.js"></script>
+    <script>
+        const unicodeInput = document.getElementById('unicodeInput');
+        const unicodeOutput = document.getElementById('unicodeOutput');
+        const unicodeConvertBtn = document.getElementById('unicodeConvertBtn');
+        const unicodeCopyBtn = document.getElementById('unicodeCopyBtn');
+        const unicodeStatus = document.getElementById('unicodeStatus');
+
+        const base64Input = document.getElementById('base64Input');
+        const base64Output = document.getElementById('base64Output');
+        const base64EncodeBtn = document.getElementById('base64EncodeBtn');
+        const base64DecodeBtn = document.getElementById('base64DecodeBtn');
+        const base64Status = document.getElementById('base64Status');
+
+        function hasUnicodeEscapes(text) {
+            return /\\u\{[0-9a-fA-F]+\}|\\u[0-9a-fA-F]{4}/.test(text);
+        }
+
+        function unicodeEscapesToText(text) {
+            try {
+                return text
+                    .replace(/\\u\{([0-9a-fA-F]+)\}/g, (_, hex) => String.fromCodePoint(parseInt(hex, 16)))
+                    .replace(/\\u([0-9a-fA-F]{4})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
+            } catch (error) {
+                throw new Error('Invalid unicode escape');
+            }
+        }
+
+        function textToUnicodeEscapes(text) {
+            return Array.from(text).map(char => {
+                const codePoint = char.codePointAt(0).toString(16);
+                return codePoint.length > 4 ? '\\u{' + codePoint + '}' : '\\u' + codePoint.padStart(4, '0');
+            }).join('');
+        }
+
+        unicodeConvertBtn.addEventListener('click', () => {
+            const rawValue = unicodeInput.value.trim();
+            if (!rawValue) {
+                unicodeOutput.value = '';
+                unicodeStatus.textContent = unicodeStatus.getAttribute(`data-${currentLanguage}`) || 'Waiting for input';
+                unicodeStatus.className = 'status-text';
+                return;
+            }
+
+            try {
+                let result;
+                if (hasUnicodeEscapes(rawValue)) {
+                    result = unicodeEscapesToText(rawValue);
+                    unicodeStatus.textContent = currentLanguage === 'zh' ? '已還原成中文字串' : 'Decoded to characters';
+                } else {
+                    result = textToUnicodeEscapes(rawValue);
+                    unicodeStatus.textContent = currentLanguage === 'zh' ? '已轉成 \\u 序列' : 'Encoded to \\u sequences';
+                }
+                unicodeStatus.className = 'status-text success';
+                unicodeOutput.value = result;
+            } catch (error) {
+                unicodeStatus.textContent = currentLanguage === 'zh' ? '轉換失敗：格式不正確' : 'Conversion failed: invalid format';
+                unicodeStatus.className = 'status-text error';
+                unicodeOutput.value = '';
+            }
+        });
+
+        unicodeCopyBtn.addEventListener('click', async () => {
+            if (!unicodeOutput.value) {
+                unicodeStatus.textContent = currentLanguage === 'zh' ? '沒有可複製的內容' : 'Nothing to copy';
+                unicodeStatus.className = 'status-text error';
+                return;
+            }
+            try {
+                await navigator.clipboard.writeText(unicodeOutput.value);
+                unicodeStatus.textContent = currentLanguage === 'zh' ? '已複製到剪貼簿' : 'Copied to clipboard';
+                unicodeStatus.className = 'status-text success';
+            } catch (error) {
+                unicodeStatus.textContent = currentLanguage === 'zh' ? '瀏覽器未允許複製' : 'Clipboard not available';
+                unicodeStatus.className = 'status-text error';
+            }
+        });
+
+        function encodeBase64(text) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(text);
+            let binary = '';
+            data.forEach(byte => {
+                binary += String.fromCharCode(byte);
+            });
+            return btoa(binary);
+        }
+
+        function decodeBase64(encoded) {
+            const binary = atob(encoded);
+            const bytes = Uint8Array.from(binary, char => char.charCodeAt(0));
+            const decoder = new TextDecoder();
+            return decoder.decode(bytes);
+        }
+
+        base64EncodeBtn.addEventListener('click', () => {
+            try {
+                base64Output.value = encodeBase64(base64Input.value);
+                base64Status.textContent = currentLanguage === 'zh' ? '編碼完成' : 'Encoded';
+                base64Status.className = 'status-text success';
+            } catch (error) {
+                base64Output.value = '';
+                base64Status.textContent = currentLanguage === 'zh' ? '編碼失敗：內容不可用' : 'Encode failed: invalid input';
+                base64Status.className = 'status-text error';
+            }
+        });
+
+        base64DecodeBtn.addEventListener('click', () => {
+            try {
+                base64Output.value = decodeBase64(base64Input.value.trim());
+                base64Status.textContent = currentLanguage === 'zh' ? '解碼完成' : 'Decoded';
+                base64Status.className = 'status-text success';
+            } catch (error) {
+                base64Output.value = '';
+                base64Status.textContent = currentLanguage === 'zh' ? '解碼失敗：不是合法的 Base64' : 'Decode failed: invalid Base64';
+                base64Status.className = 'status-text error';
+            }
+        });
+    </script>
+</body>
+</html>
+

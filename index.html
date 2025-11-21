@@ -157,6 +157,18 @@
             color: rgba(255, 255, 255, 0.8);
         }
 
+        .feature-card a {
+            display: inline-block;
+            margin-top: 1rem;
+            color: #ffd700;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .feature-card a:hover {
+            text-decoration: underline;
+        }
+
         footer {
             background: rgba(0, 0, 0, 0.3);
             color: white;
@@ -193,7 +205,8 @@
             <ul class="nav-links">
                 <li><a href="index.html" data-zh="首頁" data-en="Home">Home</a></li>
                 <li><a href="about.html" data-zh="關於我" data-en="About">About</a></li>
-                <li><a href="projects/webgame1" data-zh="Garden PingPong" data-en="Garden PingPong">Garden PingPong</a></li>
+                <!-- <li><a href="projects/webgame1" data-zh="Garden PingPong" data-en="Garden PingPong">Garden PingPong</a></li> -->
+                <li><a href="projects/text-transformer" data-zh="文字資料轉換器" data-en="Text Transformer">文字資料轉換器</a></li>
                 <li style="display: none;"><a href="projects/webgame2" data-zh="專案2" data-en="Project 2">Project 2</a></li>
                 <li><a href="contact.html" data-zh="聯絡我" data-en="Contact">Contact</a></li>
                 <li>
@@ -230,6 +243,14 @@
                     <div class="feature-card">
                         <h3 data-zh="🔧 韌體/硬體開發" data-en="🔧 Firmware/Hardware Development">🔧 Firmware/Hardware Development</h3>
                         <p data-zh="專精於 SOC 開發，包括 ESP32C3、Raspberry PI 和 STM32" data-en="Specialized in SOC development including ESP32C3, Raspberry PI and STM32">Specialized in SOC development including ESP32C3, Raspberry PI and STM32</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 data-zh="🧮 文字資料轉換器" data-en="🧮 Text Data Transformer">🧮 Text Data Transformer</h3>
+                        <p data-zh="全新工具，提供 Unicode 與 Base64 雙向轉換，讓資料處理更即時。"
+                           data-en="New browser tool delivering instant Unicode and Base64 conversions.">
+                           New browser tool delivering instant Unicode and Base64 conversions.
+                        </p>
+                        <a href="projects/text-transformer" data-zh="立刻試用" data-en="Try it now">Try it now</a>
                     </div>
                 </div>
             </div>
