@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-zh="Regex 分析工具 - David Kang" data-en="Regex Lab - David Kang">Regex Lab - David Kang</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #e8ecf1;
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background: rgba(15, 32, 39, 0.9);
+            padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00c6ff;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #f4f5f7;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #00c6ff;
+        }
+
+        .lang-switcher {
+            display: flex;
+            gap: 0.5rem;
+            margin-left: 1rem;
+        }
+
+        .lang-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .lang-btn:hover, .lang-btn.active {
+            background: rgba(0, 198, 255, 0.2);
+            border-color: #00c6ff;
+        }
+
+        main {
+            padding: 120px 0 80px;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            color: rgba(232, 236, 241, 0.9);
+        }
+
+        .lab-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+
+        .panel {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        }
+
+        .panel h2 {
+            color: #00c6ff;
+            margin-bottom: 0.5rem;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin: 1rem 0 0.4rem;
+        }
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.3);
+            color: #f4f5f7;
+            font-size: 1rem;
+        }
+
+        textarea {
+            min-height: 140px;
+            resize: vertical;
+        }
+
+        .flags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .flag {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            background: rgba(0, 0, 0, 0.25);
+            padding: 0.4rem 0.9rem;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            font-size: 0.9rem;
+        }
+
+        .flag input {
+            accent-color: #00c6ff;
+        }
+
+        .btn-row {
+            margin: 1rem 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+        }
+
+        button {
+            border: none;
+            border-radius: 999px;
+            padding: 0.6rem 1.6rem;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .primary-btn {
+            background: linear-gradient(120deg, #00c6ff, #0072ff);
+            color: white;
+            box-shadow: 0 10px 20px rgba(0, 198, 255, 0.25);
+        }
+
+        .secondary-btn {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            color: white;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        .status {
+            min-height: 1.2rem;
+            font-size: 0.95rem;
+        }
+
+        .status.success {
+            color: #9bffd7;
+        }
+
+        .status.error {
+            color: #ff8b94;
+        }
+
+        .result-block {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .match-chip {
+            display: inline-flex;
+            flex-direction: column;
+            gap: 0.2rem;
+            padding: 0.7rem;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 198, 255, 0.4);
+            margin: 0.3rem;
+            background: rgba(0, 198, 255, 0.08);
+            min-width: 160px;
+        }
+
+        .match-chip strong {
+            color: #00c6ff;
+        }
+
+        .highlight-output {
+            max-height: 260px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            padding: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .highlight-output mark {
+            background: rgba(255, 235, 59, 0.45);
+            color: inherit;
+            border-bottom: 2px solid #ffd740;
+        }
+
+        .reference-list {
+            list-style: none;
+            padding-left: 0;
+            margin: 1rem 0 0;
+        }
+
+        .reference-list li {
+            padding: 0.3rem 0;
+            color: rgba(232, 236, 241, 0.85);
+        }
+
+        footer {
+            background: rgba(0, 0, 0, 0.45);
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 4rem;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <div class="logo" data-zh="David Kang" data-en="David Kang">David Kang</div>
+            <ul class="nav-links">
+                <li><a href="../../index.html" data-zh="首頁" data-en="Home">Home</a></li>
+                <li><a href="../../about.html" data-zh="關於我" data-en="About">About</a></li>
+                <!-- <li><a href="../webgame1/index.html" data-zh="Garden PingPong" data-en="Garden PingPong">Garden PingPong</a></li> -->
+                <li><a href="../text-transformer/index.html" data-zh="文字資料轉換器" data-en="Text Transformer">文字資料轉換器</a></li>
+                <li><a href="../regex-lab/index.html" data-zh="Regex 分析工具" data-en="Regex Lab">Regex Lab</a></li>
+                <li><a href="../../contact.html" data-zh="聯絡我" data-en="Contact">Contact</a></li>
+                <li>
+                    <div class="lang-switcher">
+                        <button class="lang-btn" onclick="switchLanguage('zh')">中文</button>
+                        <button class="lang-btn active" onclick="switchLanguage('en')">EN</button>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero container">
+            <h1 data-zh="Regex 分析工具" data-en="Regex Analysis Lab">Regex Analysis Lab</h1>
+            <p data-zh="靈感來自 regex101，提供離線可用的正則表達式測試、取代與快速參考功能。"
+               data-en="Inspired by regex101, offering offline-ready testing, substitution, and quick-reference utilities.">
+               Inspired by regex101, offering offline-ready testing, substitution, and quick-reference utilities.
+            </p>
+        </section>
+
+        <section class="container lab-grid">
+            <div class="panel" id="builderPanel">
+                <h2 data-zh="模式與旗標" data-en="Pattern & Flags">Pattern & Flags</h2>
+                <label for="patternInput" data-zh="正則表達式" data-en="Regular Expression">Regular Expression</label>
+                <input id="patternInput" type="text" placeholder="例如：^\\w+@[\\w.-]+$" data-zh-placeholder="例如：^\\w+@[\\w.-]+$" data-en-placeholder="e.g. ^\\w+@[\\w.-]+$">
+
+                <div class="flags">
+                    <label class="flag"><input type="checkbox" value="g" checked>g (global)</label>
+                    <label class="flag"><input type="checkbox" value="i">i (ignore case)</label>
+                    <label class="flag"><input type="checkbox" value="m">m (multiline)</label>
+                    <label class="flag"><input type="checkbox" value="s">s (dot all)</label>
+                    <label class="flag"><input type="checkbox" value="u">u (unicode)</label>
+                    <label class="flag"><input type="checkbox" value="y">y (sticky)</label>
+                </div>
+
+                <label for="testInput" data-zh="測試字串" data-en="Test String">Test String</label>
+                <textarea id="testInput" data-zh-placeholder="貼上需要分析的內容" data-en-placeholder="Paste the text to test here"></textarea>
+
+                <div class="btn-row">
+                    <button class="primary-btn" id="runBtn" data-zh="執行分析" data-en="Run Analysis">Run Analysis</button>
+                    <button class="secondary-btn" id="clearBtn" data-zh="清空" data-en="Clear">Clear</button>
+                </div>
+                <div class="status" id="builderStatus" data-zh="等待輸入" data-en="Waiting for input">Waiting for input</div>
+            </div>
+
+            <div class="panel" id="resultsPanel">
+                <h2 data-zh="比對結果" data-en="Match Results">Match Results</h2>
+                <div class="result-block">
+                    <strong data-zh="概覽" data-en="Overview">Overview</strong>
+                    <p id="summary" style="margin-top: 0.5rem;">—</p>
+                </div>
+                <div class="result-block">
+                    <strong data-zh="matches 陣列" data-en="Matches array">Matches array</strong>
+                    <div id="matchesContainer">—</div>
+                </div>
+                <div class="result-block">
+                    <strong data-zh="群組細節" data-en="Group details">Group details</strong>
+                    <div id="groupsContainer">—</div>
+                </div>
+                <div class="result-block">
+                    <strong data-zh="高亮預覽" data-en="Highlight preview">Highlight preview</strong>
+                    <div class="highlight-output" id="highlightOutput">—</div>
+                </div>
+            </div>
+
+            <div class="panel" id="replacePanel">
+                <h2 data-zh="取代測試" data-en="Replacement Tester">Replacement Tester</h2>
+                <label for="replaceInput" data-zh="取代模板 (可用 $1, $2 ...)" data-en="Replacement template (use $1, $2 ...)">Replacement template (use $1, $2 ...)</label>
+                <input id="replaceInput" type="text" placeholder="例如：[$1]" data-zh-placeholder="例如：[$1]" data-en-placeholder="e.g. [$1]">
+                <div class="btn-row">
+                    <button class="primary-btn" id="replaceBtn" data-zh="執行取代" data-en="Apply replacement">Apply replacement</button>
+                    <button class="secondary-btn" id="copyBtn" data-zh="複製結果" data-en="Copy output">Copy output</button>
+                </div>
+                <div class="status" id="replaceStatus">—</div>
+                <label for="replaceOutput" data-zh="輸出" data-en="Output">Output</label>
+                <textarea id="replaceOutput" readonly data-zh-placeholder="取代結果會出現在此" data-en-placeholder="Replacement output appears here"></textarea>
+            </div>
+
+            <div class="panel">
+                <h2 data-zh="常用語法快速參考" data-en="Quick Reference">Quick Reference</h2>
+                <p data-zh="根據 regex101 的常用條目整理："
+                   data-en="Curated shortcuts inspired by regex101 reference:">Curated shortcuts inspired by regex101 reference:</p>
+                <ul class="reference-list">
+                    <li><code>\\d</code> — <span data-zh="數字" data-en="digit">digit</span></li>
+                    <li><code>\\w</code> — <span data-zh="英數底線" data-en="word char">word char</span></li>
+                    <li><code>\\s</code> — <span data-zh="空白字元" data-en="whitespace">whitespace</span></li>
+                    <li><code>.</code> — <span data-zh="任意字元 (受 dotAll 影響)" data-en="any char (affected by dotAll)">any char (affected by dotAll)</span></li>
+                    <li><code>^ / $</code> — <span data-zh="行開頭 / 行結尾 (multiline)" data-en="line start / end (multiline)">line start / end (multiline)</span></li>
+                    <li><code>(?:...)</code> — <span data-zh="非捕獲群組" data-en="non-capturing group">non-capturing group</span></li>
+                    <li><code>?= / ?!</code> — <span data-zh="肯定 / 否定前瞻" data-en="positive / negative lookahead">positive / negative lookahead</span></li>
+                    <li><code>{m,n}</code> — <span data-zh="重複次數" data-en="quantifier range">quantifier range</span></li>
+                </ul>
+                <p style="margin-top: 1rem;" data-zh="更多技巧可參考 regex101 線上說明（離線工具不需連線即可使用）。" data-en="For deeper dives, consult regex101 docs—this offline lab runs fully in-browser.">For deeper dives, consult regex101 docs—this offline lab runs fully in-browser.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p data-zh="&copy; 2024 David Kang's home. 版權所有." data-en="&copy; 2024 David Kang's home. All rights reserved.">&copy; 2024 David Kang's home. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="../../assets/language.js"></script>
+    <script>
+        const patternInput = document.getElementById('patternInput');
+        const flagCheckboxes = document.querySelectorAll('.flags input[type="checkbox"]');
+        const testInput = document.getElementById('testInput');
+        const runBtn = document.getElementById('runBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const builderStatus = document.getElementById('builderStatus');
+
+        const summary = document.getElementById('summary');
+        const matchesContainer = document.getElementById('matchesContainer');
+        const groupsContainer = document.getElementById('groupsContainer');
+        const highlightOutput = document.getElementById('highlightOutput');
+
+        const replaceInput = document.getElementById('replaceInput');
+        const replaceBtn = document.getElementById('replaceBtn');
+        const replaceStatus = document.getElementById('replaceStatus');
+        const replaceOutput = document.getElementById('replaceOutput');
+        const copyBtn = document.getElementById('copyBtn');
+
+        function getSelectedFlags() {
+            return Array.from(flagCheckboxes)
+                .filter(box => box.checked)
+                .map(box => box.value)
+                .join('');
+        }
+
+        function buildRegex() {
+            const pattern = patternInput.value;
+            if (!pattern) {
+                throw new Error('EMPTY_PATTERN');
+            }
+            try {
+                return new RegExp(pattern, getSelectedFlags());
+            } catch (error) {
+                throw new Error('INVALID_PATTERN:' + error.message);
+            }
+        }
+
+        function highlightMatches(text, regex) {
+            const flags = regex.flags.includes('g') ? regex.flags : regex.flags + 'g';
+            const globalRegex = new RegExp(regex.source, flags);
+            let lastIndex = 0;
+            let highlighted = '';
+            let match;
+
+            while ((match = globalRegex.exec(text)) !== null) {
+                highlighted += text.slice(lastIndex, match.index);
+                highlighted += '<mark>' + match[0] + '</mark>';
+                lastIndex = match.index + match[0].length;
+                if (match[0].length === 0) {
+                    globalRegex.lastIndex++;
+                }
+            }
+            highlighted += text.slice(lastIndex);
+            return highlighted || '—';
+        }
+
+        function renderMatches(matches) {
+            if (!matches.length) {
+                matchesContainer.textContent = '—';
+                return;
+            }
+            matchesContainer.innerHTML = matches.map((match, idx) => {
+                return '<div class="match-chip">' +
+                    '<strong>#' + (idx + 1) + '</strong>' +
+                    '<span>' + match.value + '</span>' +
+                    '<small>index: ' + match.index + '</small>' +
+                    '<small>length: ' + match.value.length + '</small>' +
+                '</div>';
+            }).join('');
+        }
+
+        function renderGroups(matches) {
+            if (!matches.length) {
+                groupsContainer.textContent = '—';
+                return;
+            }
+            const rows = matches.map((match, idx) => {
+                if (!match.groups || Object.keys(match.groups).length === 0) {
+                    return '<p><strong>#' + (idx + 1) + ':</strong> —</p>';
+                }
+                const list = Object.entries(match.groups).map(([name, value]) => {
+                    return '<li><code>' + name + '</code>: ' + (value ?? 'null') + '</li>';
+                }).join('');
+                return '<div style="margin-bottom:0.5rem;"><strong>#' + (idx + 1) + '</strong><ul>' + list + '</ul></div>';
+            });
+            groupsContainer.innerHTML = rows.join('');
+        }
+
+        function analyze() {
+            const text = testInput.value;
+            if (!text) {
+                builderStatus.textContent = currentLanguage === 'zh' ? '請輸入測試字串' : 'Please add a test string.';
+                builderStatus.className = 'status error';
+                return;
+            }
+            let regex;
+            try {
+                regex = buildRegex();
+            } catch (error) {
+                builderStatus.textContent = error.message === 'EMPTY_PATTERN'
+                    ? (currentLanguage === 'zh' ? '請輸入正則表達式' : 'Regex pattern is required.')
+                    : (currentLanguage === 'zh' ? '語法錯誤：' + error.message : 'Syntax error: ' + error.message);
+                builderStatus.className = 'status error';
+                summary.textContent = '—';
+                matchesContainer.textContent = '—';
+                groupsContainer.textContent = '—';
+                highlightOutput.textContent = '—';
+                return;
+            }
+
+            const matches = [];
+            let match;
+            if (regex.flags.includes('g') || regex.flags.includes('y')) {
+                while ((match = regex.exec(text)) !== null) {
+                    matches.push({
+                        value: match[0],
+                        index: match.index,
+                        groups: match.groups || {}
+                    });
+                    if (match[0].length === 0) {
+                        regex.lastIndex++;
+                    }
+                }
+            } else {
+                match = regex.exec(text);
+                if (match) {
+                    matches.push({
+                        value: match[0],
+                        index: match.index,
+                        groups: match.groups || {}
+                    });
+                }
+            }
+
+            builderStatus.textContent = matches.length
+                ? (currentLanguage === 'zh' ? '找到 ' + matches.length + ' 個 matches' : 'Found ' + matches.length + ' matches')
+                : (currentLanguage === 'zh' ? '未找到符合結果' : 'No matches found');
+            builderStatus.className = matches.length ? 'status success' : 'status';
+
+            summary.textContent = matches.length
+                ? (currentLanguage === 'zh'
+                    ? '共 ' + matches.length + ' 個 matches，最後一筆位置 ' + matches[matches.length - 1].index
+                    : matches.length + ' matches, last index ' + matches[matches.length - 1].index)
+                : '—';
+
+            renderMatches(matches);
+            renderGroups(matches);
+            highlightOutput.innerHTML = matches.length ? highlightMatches(text, regex) : '—';
+        }
+
+        runBtn.addEventListener('click', analyze);
+
+        clearBtn.addEventListener('click', () => {
+            patternInput.value = '';
+            testInput.value = '';
+            replaceInput.value = '';
+            replaceOutput.value = '';
+            builderStatus.textContent = builderStatus.getAttribute(`data-${currentLanguage}`) || 'Waiting for input';
+            builderStatus.className = 'status';
+            summary.textContent = '—';
+            matchesContainer.textContent = '—';
+            groupsContainer.textContent = '—';
+            highlightOutput.textContent = '—';
+            replaceStatus.textContent = '—';
+        });
+
+        replaceBtn.addEventListener('click', () => {
+            const text = testInput.value;
+            const template = replaceInput.value;
+            if (!text || !template) {
+                replaceStatus.textContent = currentLanguage === 'zh' ? '請輸入測試字串與取代模板' : 'Provide text and template.';
+                replaceStatus.className = 'status error';
+                return;
+            }
+            let regex;
+            try {
+                regex = buildRegex();
+            } catch {
+                replaceStatus.textContent = currentLanguage === 'zh' ? '請先修正正則表達式' : 'Fix regex first.';
+                replaceStatus.className = 'status error';
+                return;
+            }
+            try {
+                replaceOutput.value = text.replace(regex, template);
+                replaceStatus.textContent = currentLanguage === 'zh' ? '已完成取代' : 'Replacement done';
+                replaceStatus.className = 'status success';
+            } catch (error) {
+                replaceStatus.textContent = error.message;
+                replaceStatus.className = 'status error';
+            }
+        });
+
+        copyBtn.addEventListener('click', async () => {
+            if (!replaceOutput.value) {
+                replaceStatus.textContent = currentLanguage === 'zh' ? '沒有可複製的輸出' : 'Nothing to copy';
+                replaceStatus.className = 'status error';
+                return;
+            }
+            try {
+                await navigator.clipboard.writeText(replaceOutput.value);
+                replaceStatus.textContent = currentLanguage === 'zh' ? '已複製到剪貼簿' : 'Copied to clipboard';
+                replaceStatus.className = 'status success';
+            } catch {
+                replaceStatus.textContent = currentLanguage === 'zh' ? '瀏覽器未允許複製' : 'Clipboard unavailable';
+                replaceStatus.className = 'status error';
+            }
+        });
+    </script>
+</body>
+</html>
+
